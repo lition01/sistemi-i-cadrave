@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeachEase - Beach Umbrella Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add to index.html head section -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="spinner"></div>
+        <h2>Loading Beach Manager</h2>
+    </div>
+
+    <!-- Login Container -->
+    <div id="login-container" class="login-container">
+        <div class="left-panel">
+            <div class="left-content">
+                <h1>Welcome to <span>BeachEase</span></h1>
+                <p>Your ultimate beach umbrella management system. Reserve your perfect spot on the beach, manage
+                    rentals, and enjoy a hassle-free day under the sun.</p>
+            </div>
+        </div>
+        <div class="right-panel">
+            <button class="settings-btn">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="auth-container">
+                <div class="logo">
+                    <h2><span>Beach</span>Ease</h2>
+                </div>
+
+                <div class="success-message" id="successMessage"></div>
+
+                <!-- Login Form -->
+                <div class="form-container login-form" id="loginForm">
+                    <div class="subtitle">
+                        <p>Sign in to your account</p>
+                    </div>
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="Email Address"
+                                required>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="error-message" id="loginEmailError"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password"
+                                required>
+                            <div class="input-icon password-toggle" id="loginPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="error-message" id="loginPasswordError"></div>
+                        </div>
+                        <div class="role-selector">
+                            <div class="role-option active" data-role="user"><span>Employee</span></div>
+                            <div class="role-option" data-role="admin"><span>Beach Manager</span></div>
+                        </div>
+                        <div class="form-footer">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Remember me</label>
+                            </div>
+                            <a href="#" class="forgot-password">Forgot Password?</a>
+                        </div>
+                        <button type="submit" class="btn-auth">Sign In</button>
+                    </form>
+                    <div class="divider">
+                        <span>or continue with</span>
+                    </div>
+                    <div class="social-login">
+                        <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+                        <button class="social-btn google"><i class="fab fa-google"></i> Google</button>
+                    </div>
+                    <div class="auth-link">
+                        <p>Don't have an account? <a id="showSignup">Create account</a></p>
+                    </div>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="form-container signup-form hidden" id="signupForm">
+                    <div class="subtitle">
+                        <p>Create your BeachEase account</p>
+                    </div>
+                    <form id="signupFormElement">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="fullName" placeholder="Full Name" required>
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="error-message" id="fullNameError"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="signupEmail" placeholder="Email Address"
+                                required>
+                            <div class="input-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="error-message" id="signupEmailError"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="signupPassword" placeholder="Password"
+                                required>
+                            <div class="input-icon password-toggle" id="signupPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                            </div>
+                            <div class="error-message" id="signupPasswordError"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="confirmPassword"
+                                placeholder="Confirm Password" required>
+                            <div class="input-icon password-toggle" id="confirmPasswordToggle">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="error-message" id="confirmPasswordError"></div>
+                        </div>
+                        <div class="role-selector">
+                            <div class="role-option active" data-role="user"><span>Customer</span></div>
+                            <div class="role-option" data-role="admin"><span>Beach Manager</span></div>
+                        </div>
+                        <div class="form-group" id="adminKeyGroup" style="display: none;">
+                            <input type="text" class="form-control" id="adminKey" placeholder="Manager Access Key">
+                            <div class="input-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="error-message" id="adminKeyError"></div>
+                        </div>
+                        <div class="form-footer">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="termsAgree" required>
+                                <label for="termsAgree">I agree to the Terms & Privacy Policy</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-auth">Create Account</button>
+                    </form>
+                    <div class="divider">
+                        <span>or sign up with</span>
+                    </div>
+                    <div class="social-login">
+                        <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+                        <button class="social-btn google"><i class="fab fa-google"></i> Google</button>
+                    </div>
+                    <div class="auth-link">
+                        <p>Already have an account? <a id="showLogin">Sign in</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="demo-credentials">
+            <p>Demo credentials:</p>
+            <p>Username: admin | Password: password</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-container" class="app-container hidden">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-umbrella-beach"></i>
+                <h2 id="beach-name">Beach Manager</h2>
+                <img id="logo-main" src="/placeholder.svg" alt="" width="70px" style="margin-left: 20px;">
+            </div>
+            <nav class="menu">
+                <button class="menu-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="menu-item" data-view="reservations">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Reservations</span>
+                </button>
+                <button class="menu-item" data-view="calendar">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Calendar</span>
+                </button>
+                <button class="menu-item" data-view="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <!-- Configuration Menu Item -->
+                <button class="menu-item" data-view="configuration">
+                    <i class="fas fa-cogs"></i>
+                    <span>Configuration</span>
+                </button>
+                <!-- Receipt Menu Item -->
+                <button class="menu-item" data-view="receipt">
+                    <i class="fas fa-receipt"></i>
+                    <span>Receipt</span>
+                </button>
+            </nav>
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h4 id="user-display-name">Admin User</h4>
+                    <p>Manager</p>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button id="save-data">
+                    <i class="fas fa-save"></i>
+                    <span>Save Data</span>
+                </button>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="date-display">
+                    <h3 id="current-date"></h3>
+                </div>
+                <div class="actions">
+                    <div class="weather-widget">
+                        <i class="fas fa-sun"></i>
+                        <span>28°C</span>
+                    </div>
+                    <button id="add-reservation" class="btn primary">
+                        <i class="fas fa-plus"></i>
+                        <span>New Reservation</span>
+                    </button>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="view-container">
+                <!-- Dashboard View -->
+                <section id="dashboard" class="view active">
+                    <div class="dashboard-header">
+                        <h2>Beach Layout</h2>
+                        <div class="layout-controls">
+                            <button id="change-status1" class="btn secondary">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Change Type</span>
+                            </button>
+                            <button id="edit-layout" class="btn secondary">
+                                <i class="fas fa-edit"></i>
+                                <span>Edit Layout</span>
+                            </button>
+                            <div class="status-filter">
+                                <span>Filter:</span>
+                                <select id="status-filter">
+                                    <option value="all">All</option>
+                                    <option value="available">Available</option>
+                                    <option value="reserved">Reserved</option>
+                                    <option value="occupied">Occupied</option>
+                                    <option value="maintenance">Maintenance</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-icon available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="available-count">0</h3>
+                                <p>Available</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon reserved">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="reserved-count">0</h3>
+                                <p>Reserved</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon occupied">
+                                <i class="fas fa-umbrella-beach"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="occupied-count">0</h3>
+                                <p>Occupied</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon maintenance">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="maintenance-count">0</h3>
+                                <p>Maintenance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="beach-layout">
+                        <div class="sea-indicator">
+                            <div class="waves"></div>
+                            <span>Sea</span>
+                        </div>
+                        <div id="umbrella-grid" class="umbrella-grid"></div>
+                    </div>
+                    <div class="status-legend">
+                        <div class="legend-item">
+                            <span class="status-dot available"></span>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-dot reserved"></span>
+                            <span>Reserved</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-dot occupied"></span>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="status-dot maintenance"></span>
+                            <span>Maintenance</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reservations View -->
+                <section id="reservations" class="view">
+                    <div class="reservations-header">
+                        <h2>Reservations</h2>
+                        <div class="reservation-controls">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="reservation-search" placeholder="Search reservations...">
+                            </div>
+                            <div class="filter-dropdown">
+                                <select id="reservation-filter">
+                                    <option value="all">All Reservations</option>
+                                    <option value="today">Today</option>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="past">Past</option>
+                                    <option value="subscription">Subscriptions</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reservations-list" id="reservations-list">
+                        <!-- Reservations will be populated here -->
+                    </div>
+
+                    <div class="export-controls">
+                        <button id="export-excel" class="btn secondary">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Export to Excel</span>
+                        </button>
+                        <button id="export-pdf" class="btn secondary">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Export to PDF</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Calendar View -->
+                <section id="calendar" class="view">
+                    <div class="calendar-header">
+                       
+                        <div class="calendar-controls">
+                            <div class="calendar-date-nav">
+                                <h3 id="calendar-month-year">June 2023</h3>
+                                <div class="month-navigation">
+                                    <button id="prev-month" class="month-nav-btn">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button id="next-month" class="month-nav-btn">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button id="today-btn" class="today-btn">Today</button>
+                        </div>
+                    </div>
+                    <div class="calendar-container">
+                        <div class="calendar-weekdays">
+                            <div>Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                        </div>
+                        <div class="calendar-days-wrapper">
+                            <div id="calendar-days" class="calendar-days">
+                                <!-- Calendar days will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="calendar-dot single"></span>
+                            <span>Single Reservation</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="calendar-dot subscription"></span>
+                            <span>Subscription</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings View -->
+                <section id="settings" class="view">
+                    <div class="settings-header">
+                        <h2>System Settings</h2>
+                    </div>
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <h3>Beach Information</h3>
+                            <div class="form-group">
+                                <label for="beach-bar-name">Beach Bar Name:</label>
+                                <input type="text" id="beach-bar-name" placeholder="Enter beach bar name">
+                            </div>
+                            <div class="form-group">
+                                <label for="beach-location">Location:</label>
+                                <input type="text" id="beach-location" placeholder="Enter beach location">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-phone">Contact Phone:</label>
+                                <input type="tel" id="contact-phone" placeholder="Enter contact phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Contact Email:</label>
+                                <input type="email" id="contact-email" placeholder="Enter contact email">
+                            </div>
+                            <button id="save-beach-info" class="btn primary">Save Beach Information</button>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3>Reservation Settings</h3>
+                            <div class="form-group">
+                                <label for="opening-time">Opening Time:</label>
+                                <input type="time" id="opening-time" value="08:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="closing-time">Closing Time:</label>
+                                <input type="time" id="closing-time" value="20:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="time-slot">Time Slot Duration (minutes):</label>
+                                <select id="time-slot">
+                                    <option value="30">30 minutes</option>
+                                    <option value="60" selected>1 hour</option>
+                                    <option value="120">2 hours</option>
+                                    <option value="240">4 hours</option>
+                                </select>
+                            </div>
+                            <button id="save-settings" class="btn primary">Save Settings</button>
+                        </div>
+                        <div class="settings-card">
+                            <h3>Account Settings</h3>
+                            <div class="form-group">
+                                <label for="display-name">Display Name:</label>
+                                <input type="text" id="display-name" value="Admin User">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" value="admin@beachmanager.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="current-password">Current Password:</label>
+                                <input type="password" id="current-password" placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password:</label>
+                                <input type="password" id="new-password" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm Password:</label>
+                                <input type="password" id="confirm-password" placeholder="Confirm new password">
+                            </div>
+                            <button id="save-account" class="btn primary">Update Account</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Configuration View -->
+                <section id="configuration" class="view">
+                    <div class="settings-header">
+                        <h2>Beach Bar Configuration</h2>
+                    </div>
+                    <div class="settings-container">
+                        <!-- Beach Information -->
+                        <div class="settings-card">
+                            <h3>Beach Information</h3>
+                            <div class="form-group">
+                                <label for="config-beach-name">Beach Bar Name:</label>
+                                <input type="text" id="config-beach-name" placeholder="Enter beach bar name">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-beach-location">Location:</label>
+                                <input type="text" id="config-beach-location" placeholder="Enter beach location">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-contact-phone">Contact Phone:</label>
+                                <input type="tel" id="config-contact-phone" placeholder="Enter contact phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-contact-email">Contact Email:</label>
+                                <input type="email" id="config-contact-email" placeholder="Enter contact email">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-description">Description:</label>
+                                <textarea id="config-description" placeholder="Enter beach bar description"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Beach Layout Configuration -->
+                        <div class="settings-card">
+                            <h3>Beach Layout Configuration</h3>
+                            <div class="form-group">
+                                <label for="config-rows-count">Number of Rows:</label>
+                                <input type="number" id="config-rows-count" min="1" max="20" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-columns-count">Number of Columns:</label>
+                                <input type="number" id="config-columns-count" min="1" max="20" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label>Layout Preview:</label>
+                                <div id="config-layout-preview" class="layout-preview"></div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Configuration -->
+                        <div class="settings-card">
+                            <h3>Pricing Configuration</h3>
+                            <div class="pricing-group" data-type="family">
+                                <div class="form-group">
+                                    <label for="config-family-price">Family Umbrella Price <span class="type-count">(0
+                                            umbrellas)</span>:</label>
+                                    <input type="number" id="config-family-price" placeholder="Enter family price"
+                                        min="0" step="0.01" value="10.00">
+                                </div>
+                            </div>
+                            <div class="pricing-group" data-type="double">
+                                <div class="form-group">
+                                    <label for="config-double-price">Double Umbrella Price <span class="type-count">(0
+                                            umbrellas)</span>:</label>
+                                    <input type="number" id="config-double-price" placeholder="Enter double price"
+                                        min="0" step="0.01" value="15.00">
+                                </div>
+                            </div>
+                            <div class="pricing-group" data-type="vip">
+                                <div class="form-group">
+                                    <label for="config-vip-price">VIP Umbrella Price <span class="type-count">(0
+                                            umbrellas)</span>:</label>
+                                    <input type="number" id="config-vip-price" placeholder="Enter VIP price" min="0"
+                                        step="0.01" value="25.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Operating Hours -->
+                        <div class="settings-card">
+                            <h3>Operating Hours</h3>
+                            <div class="form-group">
+                                <label for="config-opening-time">Opening Time:</label>
+                                <input type="time" id="config-opening-time" value="08:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-closing-time">Closing Time:</label>
+                                <input type="time" id="config-closing-time" value="20:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="config-time-slot">Time Slot Duration (minutes):</label>
+                                <select id="config-time-slot">
+                                    <option value="30">30 minutes</option>
+                                    <option value="60" selected>1 hour</option>
+                                    <option value="120">2 hours</option>
+                                    <option value="240">4 hours</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Operating Days:</label>
+                                <div class="days-selector">
+                                    <label><input type="checkbox" value="0" checked> Sunday</label>
+                                    <label><input type="checkbox" value="1" checked> Monday</label>
+                                    <label><input type="checkbox" value="2" checked> Tuesday</label>
+                                    <label><input type="checkbox" value="3" checked> Wednesday</label>
+                                    <label><input type="checkbox" value="4" checked> Thursday</label>
+                                    <label><input type="checkbox" value="5" checked> Friday</label>
+                                    <label><input type="checkbox" value="6" checked> Saturday</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Beach Logo -->
+                        <div class="settings-card">
+                            <h3>Beach Bar Logo</h3>
+                            <div class="form-group">
+                                <label for="logo-upload">Upload Logo:</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="logo-upload" accept="image/*">
+                                    <label for="logo-upload" class="custom-file-label">Choose File</label>
+                                </div>
+                                <div id="logo-preview" class="logo-preview" style="display: none;">
+                                    <img id="logo-image" src="/placeholder.svg" alt="Logo Preview">
+                                    <button class="btn small danger remove-logo" id="remove-logo">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="form-actions">
+                            <button id="save-configuration" class="btn primary">
+                                <i class="fas fa-save"></i>
+                                <span>Save Configuration</span>
+                            </button>
+                            <button id="reset-configuration" class="btn secondary">
+                                <i class="fas fa-undo"></i>
+                                <span>Reset</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Enhanced Receipt View -->
+                <section id="receipt" class="view">
+                    <div class="receipt-container">
+                        <!-- Receipt Header -->
+                        <div class="receipt-header">
+                            <div class="receipt-header-content">
+                                <div class="receipt-logo">
+                                    <i class="fas fa-umbrella-beach"></i>
+                                </div>
+                                <div class="receipt-title">
+                                    <h1>Daily Revenue Report</h1>
+                                    <p class="receipt-subtitle">Beach Umbrella Management</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Receipt Controls -->
+                        <div class="receipt-controls">
+                            <div class="date-selector">
+                                <label for="receipt-date">Select Date:</label>
+                                <input type="date" id="receipt-date" class="receipt-date-input">
+                                <button id="generate-receipt" class="btn primary">
+                                    <i class="fas fa-calculator"></i>
+                                    Generate Report
+                                </button>
+                            </div>
+                            <div class="receipt-period-selector">
+                                <label for="receipt-period">Report Period:</label>
+                                <select id="receipt-period" class="receipt-period-select">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Receipt Content -->
+                        <div id="receipt-content" class="receipt-content">
+                            <!-- Default empty state -->
+                            <div class="empty-state">
+                                <i class="fas fa-chart-pie"></i>
+                                <p>Select a date and generate report to view revenue data</p>
+                            </div>
+                        </div>
+
+                        <!-- Receipt Actions -->
+                        
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Umbrella Details -->
+    <div id="umbrella-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Umbrella #1</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="umbrella-status">
+                    <label for="umbrella-status-select">Status:</label>
+                    <select id="umbrella-status-select">
+                        <option value="available">Available</option>
+                        <option value="reserved">Reserved</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="umbrella-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Location:</span>
+                        <span id="umbrella-location" class="detail-value">Row 1, Column 1</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Current Reservation:</span>
+                        <span id="umbrella-reservation" class="detail-value">None</span>
+                    </div>
+                </div>
+                <div class="umbrella-actions">
+                    <button id="make-reservation" class="btn primary">Make Reservation</button>
+                    <button id="view-history" class="btn secondary">View History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Reservation -->
+    <div id="reservation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="reservation-modal-title">New Reservation</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="reservation-form">
+                    <div class="form-group">
+                        <label for="reservation-type">Reservation Type:</label>
+                        <select id="reservation-type">
+                            <option value="single">Single Day</option>
+                            <option value="subscription">Subscription</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="single-reservation-fields">
+                        <label for="reservation-date">Date:</label>
+                        <input type="date" id="reservation-date" required>
+                    </div>
+                    <div class="form-group hidden" id="subscription-fields">
+                        <label for="subscription-start">Start Date:</label>
+                        <input type="date" id="subscription-start">
+                        <label for="subscription-end">End Date:</label>
+                        <input type="date" id="subscription-end">
+                        <label for="subscription-days">Days of Week:</label>
+                        <div class="days-selector">
+                            <label><input type="checkbox" value="0"> Sun</label>
+                            <label><input type="checkbox" value="1"> Mon</label>
+                            <label><input type="checkbox" value="2"> Tue</label>
+                            <label><input type="checkbox" value="3"> Wed</label>
+                            <label><input type="checkbox" value="4"> Thu</label>
+                            <label><input type="checkbox" value="5"> Fri</label>
+                            <label><input type="checkbox" value="6"> Sat</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reservation-time">Time:</label>
+                        <div class="time-selector">
+                            <select id="reservation-time-start">
+                                <!-- Time options will be populated here -->
+                            </select>
+                            <span>to</span>
+                            <select id="reservation-time-end">
+                                <!-- Time options will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="umbrella-select">Umbrella:</label>
+                        <select id="umbrella-select">
+                            <!-- Umbrella options will be populated here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-name">Customer Name:</label>
+                        <input type="text" id="customer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer-phone">Phone Number:</label>
+                        <input type="tel" id="customer-phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="reservation-notes">Notes:</label>
+                        <textarea id="reservation-notes"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn primary">Save Reservation</button>
+                        <button type="button" class="btn secondary cancel-reservation">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-content">
+            <p id="toast-message">Operation completed successfully</p>
+        </div>
+        <button class="toast-close">&times;</button>
+    </div>
+
+    <!-- Popup Overlay for Dashboard Shutdown -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <h3>Dashboard is disabled</h3>
+            <p>Enter the code to re-enable the dashboard:</p>
+            <input type="password" id="unlock-code" placeholder="Enter code...">
+            <button onclick="unlockDashboard()">Unlock Dashboard</button>
+            <p id="error-message" class="error-message"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+</body>
+
+</html>
